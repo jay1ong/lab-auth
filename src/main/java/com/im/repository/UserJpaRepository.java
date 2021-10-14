@@ -18,7 +18,9 @@ public interface UserJpaRepository extends EntityGraphJpaRepository<User, String
     QUser DSL = QUser.user;
 
     default User loadUserByUsername(String username) {
-        return findOne(DSL.username.eq(username)).orElseThrow(() -> ExceptionUtil.wrapRuntime("指定的用户不存在"));
+        return findOne(DSL.username.eq(username)).orElse(null);
     }
+
+    Boolean existsByUsername(String username);
 
 }

@@ -29,19 +29,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/swagger-ui",
                 "/swagger-resources",
                 "/swagger-resources/configuration/ui",
-                "/swagger-resources/configuration/security",
-                "/api/login"
+                "/swagger-resources/configuration/security"
         );
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/", "/favicon.ico").permitAll()
-                .antMatchers("/swagger-ui", "/swagger-ui/**", "/test/**").hasRole("ADMIN")
-//                .anyRequest().authenticated()
+        http
+                .csrf().disable()
+                .headers().frameOptions().disable()
                 .and()
-//                .httpBasic()
-//                .and()
+                .authorizeRequests()
+                .antMatchers("/", "/favicon.ico","/auth/login", "/auth/register").permitAll()
+//                .antMatchers("/auth/login", "/auth/register").anonymous()
+                .antMatchers("/swagger-ui", "/swagger-ui/**", "/test/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+                .and()
                 .logout().permitAll()
                 .and()
                 .rememberMe()
