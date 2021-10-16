@@ -1,4 +1,4 @@
-package com.im;
+package com.im.payload;
 
 import lombok.Data;
 
@@ -14,6 +14,6 @@ public class HttpResult {
 
     String message;
 
-    String data;
+    Object data;
 
 }

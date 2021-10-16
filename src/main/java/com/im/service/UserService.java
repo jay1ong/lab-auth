@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,8 +26,9 @@ public class UserService implements UserDetailsService {
     private final ApplicationContext context;
 
     @Override
-    public User loadUserByUsername(String s) throws UsernameNotFoundException {
-        return jpaRepository.loadUserByUsername(s);
+    @Transactional
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return UserDetails.build(jpaRepository.loadUserByUsername(username));
     }
 
     public void saveUser(String username, String password) {

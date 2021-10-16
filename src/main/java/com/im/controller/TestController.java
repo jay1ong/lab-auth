@@ -1,10 +1,12 @@
 package com.im.controller;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.im.po.User;
 import com.im.po.VerifierEmbed;
 import com.im.repository.UserJpaRepository;
+import com.im.service.UserDetails;
 import com.im.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -59,7 +61,7 @@ public class TestController {
         // 更新
         User user = new User();
         if (StrUtil.isNotBlank(id)) {
-            user = jpaRepository.findById(id).orElse(user);
+            user = jpaRepository.findById(Convert.toStr(id)).orElse(user);
         }
         String random = RandomUtil.randomNumbers(32);
         user.setId(StrUtil.isBlank(id) ? random : id);
@@ -71,14 +73,6 @@ public class TestController {
             }
         }
         user.setUsername(username);
-        if (StrUtil.isBlank(roles)) {
-            if (user.getRoles() != null) {
-                roles = user.getRoles();
-            } else {
-                roles = random;
-            }
-        }
-        user.setRoles(roles);
         if (StrUtil.isBlank(password)) {
             if (user.getPassword() != null) {
                 password = user.getPassword();
@@ -123,7 +117,7 @@ public class TestController {
 
     @ApiOperation("测试根据用户名获取用户")
     @GetMapping("/loadUserByUsername")
-    public User loadUserByUsername(@RequestParam String username) {
+    public UserDetails loadUserByUsername(@RequestParam String username) {
         return userService.loadUserByUsername(username);
     }
 

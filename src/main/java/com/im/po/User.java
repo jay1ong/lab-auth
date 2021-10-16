@@ -1,11 +1,8 @@
 package com.im.po;
 
-import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.im.enums.StatusEnum;
-import com.im.security.Authority;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +15,13 @@ import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,7 +44,7 @@ import java.util.stream.Collectors;
 @NamedEntityGraph(name = User.EG_DEFAULT)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = User.class)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class User implements UserDetails, Serializable {
+public class User implements Serializable {
 
     public static final String EG_DEFAULT = "User.default";
 
@@ -99,12 +93,6 @@ public class User implements UserDetails, Serializable {
      */
     @Column
     private String password;
-
-    /**
-     * 用户角色
-     */
-    @Column
-    private String roles;
 
     /**
      * 账户是否过期
@@ -216,6 +204,15 @@ public class User implements UserDetails, Serializable {
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            schema = "auth",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"),
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT),
+            inverseForeignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private Set<Role> roles = new HashSet<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -227,14 +224,5 @@ public class User implements UserDetails, Serializable {
     @Override
     public int hashCode() {
         return 0;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (StrUtil.isBlank(roles)){
-            throw ExceptionUtil.wrapRuntime("该用户未指定角色");
-        }
-        String[] strings = roles.split(",");
-        return Arrays.stream(strings).map(Authority::new).collect(Collectors.toSet());
     }
 }

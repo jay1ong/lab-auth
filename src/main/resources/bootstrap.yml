@@ -18,12 +18,3 @@ spring:
             refresh: true
   profiles:
     active: ${SPRING-PROFILES-ACTIVE:dev}
-#  security:
-#    user:
-#      name: user
-#      password: user
-#      roles: ADMIN
-
-
-
-
