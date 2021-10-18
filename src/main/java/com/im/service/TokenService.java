@@ -49,8 +49,7 @@ public class TokenService implements AuthenticationEntryPoint {
 
     public String generateToken(Authentication authentication) {
         Instant now = Instant.now();
-//        long expiry = 36000L;
-        long expiry = 60L;
+        long expiry = 36000L;
         // @formatter:off
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
