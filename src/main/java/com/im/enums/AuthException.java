@@ -23,6 +23,8 @@ public enum AuthException implements IException {
     // token异常
     INVALID_TOKEN("11201", "token签名不合法"),
     TOKEN_EXPIRED("11202", "token已过期"),
+    TOKEN_PARSING_ERROR("11203", "token解析异常,鉴权失败"),
+    TOKEN_PARSING_USERNAME_ERROR("11204", "token解析用户名异常,鉴权失败"),
     ;
     private final String code;
     private final String message;

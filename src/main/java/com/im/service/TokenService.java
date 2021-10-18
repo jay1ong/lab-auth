@@ -1,5 +1,6 @@
 package com.im.service;
 
+import cn.hutool.core.convert.Convert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.im.enums.AuthException;
 import com.im.exception.BizException;
@@ -9,16 +10,25 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +38,8 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-public class TokenService {
+@Slf4j
+public class TokenService implements AuthenticationEntryPoint {
 
     @Value("${jwt.private.key}")
     RSAPrivateKey privateKey;
@@ -36,11 +47,10 @@ public class TokenService {
     @Value("${jwt.public.key}")
     RSAPublicKey publicKey;
 
-    private final ObjectMapper objectMapper;
-
     public String generateToken(Authentication authentication) {
         Instant now = Instant.now();
-        long expiry = 36000L;
+//        long expiry = 36000L;
+        long expiry = 60L;
         // @formatter:off
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -53,7 +63,8 @@ public class TokenService {
                 .claim("scope", scope)
                 .build();
         // @formatter:on
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).build();
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .type(JOSEObjectType.JWT).build();
         SignedJWT jwt = new SignedJWT(header, claims);
         return sign(jwt).serialize();
     }
@@ -67,21 +78,51 @@ public class TokenService {
         }
     }
 
-    public boolean validateToken(String authToken) throws ParseException, JOSEException {
-        JWSObject jwsObject = JWSObject.parse(authToken);
+    public boolean validateToken(String authToken) throws JOSEException {
+        JWSObject jwsObject;
+        try {
+            jwsObject = JWSObject.parse(authToken);
+        } catch (ParseException e) {
+            throw new BizException(AuthException.TOKEN_PARSING_ERROR);
+        }
         JWSVerifier jwsVerifier = new RSASSAVerifier(this.publicKey);
-        JWTClaimsSet claims = objectMapper.convertValue(jwsObject.getPayload(), JWTClaimsSet.class);
         if (!jwsObject.verify(jwsVerifier)) {
             throw new BizException(AuthException.INVALID_TOKEN);
         }
-        if (claims.getExpirationTime().getTime() < new Date().getTime()) {
+        Map<String, Object> map = jwsObject.getPayload().toJSONObject();
+
+        long exp = new Date(Convert.toLong(map.get("exp")) * 1000).getTime();
+        long now = new Date(Instant.now().toEpochMilli()).getTime();
+        if (exp < now) {
             throw new BizException(AuthException.TOKEN_EXPIRED);
         }
         return true;
     }
 
-    public String getUserNameFromToken(String authToken) throws ParseException {
-        JWSObject jwsObject = JWSObject.parse(authToken).getPayload().toJWSObject();
-        return objectMapper.convertValue(jwsObject.getPayload(), JWTClaimsSet.class).getSubject();
+    public String getUserNameFromToken(String authToken) {
+        Map<String, Object> map;
+        try {
+            map = JWSObject.parse(authToken).getPayload().toJSONObject();
+        } catch (ParseException e) {
+            throw new BizException(AuthException.TOKEN_PARSING_USERNAME_ERROR);
+        }
+        return Convert.toStr(map.get("sub"));
+    }
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+        log.error("鉴权失败: {}", authException.getMessage());
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        final Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        body.put("error", "未鉴权");
+        body.put("message", authException.getMessage());
+        body.put("path", request.getServletPath());
+
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getOutputStream(), body);
     }
 }

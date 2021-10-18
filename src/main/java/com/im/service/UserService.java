@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.im.po.User;
 import com.im.po.VerifierEmbed;
 import com.im.repository.UserJpaRepository;
+import com.im.security.model.UserDetails;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.userdetails.UserDetailsService;

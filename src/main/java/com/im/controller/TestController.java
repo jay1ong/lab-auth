@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.im.po.User;
 import com.im.po.VerifierEmbed;
 import com.im.repository.UserJpaRepository;
-import com.im.service.UserDetails;
+import com.im.security.model.UserDetails;
 import com.im.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

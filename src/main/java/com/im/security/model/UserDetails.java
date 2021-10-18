@@ -1,4 +1,4 @@
-package com.im.service;
+package com.im.security.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.im.po.User;

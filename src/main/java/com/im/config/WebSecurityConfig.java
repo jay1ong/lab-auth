@@ -1,6 +1,7 @@
 package com.im.config;
 
 import com.im.security.jwt.AuthTokenFilterService;
+import com.im.service.TokenService;
 import com.im.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ import java.security.interfaces.RSAPublicKey;
  */
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${jwt.public.key}")
@@ -40,6 +41,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final AuthTokenFilterService authenticationJwtTokenFilter;
 
     private final UserService userService;
+
+    private final TokenService tokenService;
 
     @Override
     public void configure(WebSecurity web) {
@@ -55,6 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors().and().csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(tokenService).and()
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
@@ -64,12 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout().permitAll()
                 .and()
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling((exceptions) -> exceptions
-                        .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
-                );
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(authenticationJwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
