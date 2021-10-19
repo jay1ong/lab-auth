@@ -4,7 +4,6 @@ import com.cosium.spring.data.jpa.entity.graph.repository.support.EntityGraphJpa
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**

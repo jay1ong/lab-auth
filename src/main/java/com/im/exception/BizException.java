@@ -1,6 +1,5 @@
 package com.im.exception;
 
-import lombok.Data;
 import lombok.Getter;
 
 @Getter
