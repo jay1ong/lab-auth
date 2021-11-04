@@ -3,9 +3,9 @@ package com.im.auth.repository;
 import com.cosium.spring.data.jpa.entity.graph.repository.EntityGraphJpaRepository;
 import com.cosium.spring.data.jpa.entity.graph.repository.EntityGraphQuerydslPredicateExecutor;
 import com.im.auth.enums.AuthException;
-import com.im.auth.exception.BizException;
 import com.im.auth.po.QUser;
 import com.im.auth.po.User;
+import com.im.core.exception.BizException;
 import org.springframework.stereotype.Repository;
 
 /**

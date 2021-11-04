@@ -2,12 +2,12 @@ package com.im.auth.controller;
 
 import com.im.auth.dto.UserRequest;
 import com.im.auth.enums.AuthException;
-import com.im.auth.exception.BizException;
 import com.im.auth.payload.LoginResponse;
 import com.im.auth.repository.UserJpaRepository;
 import com.im.auth.security.model.UserDetails;
 import com.im.auth.service.TokenService;
 import com.im.auth.service.UserService;
+import com.im.core.exception.BizException;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

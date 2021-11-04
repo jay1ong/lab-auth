@@ -3,7 +3,7 @@ package com.im.auth.service;
 import cn.hutool.core.convert.Convert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.im.auth.enums.AuthException;
-import com.im.auth.exception.BizException;
+import com.im.core.exception.BizException;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
