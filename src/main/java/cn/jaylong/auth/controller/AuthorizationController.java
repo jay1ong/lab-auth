@@ -72,7 +72,7 @@ public class AuthorizationController {
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
-            loginResponse.setToken(token);
+            loginResponse.setAccessToken(token);
             loginResponse.setId(userDetails.getId());
             loginResponse.setUsername(userDetails.getUsername());
             loginResponse.setEmail(userDetails.getEmail());

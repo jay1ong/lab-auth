@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 public class LoginResponse {
 
-    private String token;
+    private String accessToken;
     private String type = "Bearer";
     private String id;
     private String username;
