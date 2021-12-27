@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'org.springframework.boot' version '2.6.0'
+}
+
+group = group
+version = version
+sourceCompatibility = '1.8'
+
+import org.apache.tools.ant.filters.ReplaceTokens
+processResources {
+    project.properties.findAll().each { prop ->
+        if (prop.value != null && prop.value instanceof String) {
+            filter(ReplaceTokens, tokens: [ (prop.key): prop.value])
+            filter(ReplaceTokens, tokens: [ ('project.' + prop.key): prop.value])
+        }
+    }
+}
+
+repositories {
+    maven {
+        url repoUrl
+        credentials {
+            username = repoUsername
+            password = repoPassword
+        }
+        allowInsecureProtocol(true)
+    }
+    maven {
+        url 'https://maven.aliyun.com/repository/public/'
+    }
+    maven {
+        url 'https://maven.aliyun.com/repository/central/'
+    }
+    mavenCentral()
+    mavenLocal()
+}
+
+ext{
+    springcloudVersion = '2020.0.3'
+    nimbusjosejwtVersion = '9.15.2'
+}
+
+dependencies {
+    implementation(platform("cn.jaylong:lab-dependencies-gradle:$version"))
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springcloudVersion"))
+    annotationProcessor(platform("cn.jaylong:lab-dependencies-gradle:$version"))
+    implementation('cn.jaylong:lab-data-jpa-gradle')
+    implementation('cn.jaylong:lab-autoconfig-gradle')
+    annotationProcessor('cn.jaylong:lab-autoconfig-gradle')
+    annotationProcessor(
+            'org.projectlombok:lombok',
+            'org.mapstruct:mapstruct-processor',
+            'javax.annotation:javax.annotation-api',
+            'com.querydsl:querydsl-apt::jpa',
+            'com.querydsl:querydsl-apt::general',
+            'org.hibernate.javax.persistence:hibernate-jpa-2.1-api'
+    )
+    implementation("com.nimbusds:nimbus-jose-jwt:$nimbusjosejwtVersion")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-oauth2-jose")
+}
+
+test {
+    useJUnitPlatform()
+}
