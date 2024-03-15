@@ -33,7 +33,7 @@
         <javax-persistence-api.version>2.2</javax-persistence-api.version>
         <hibernate-jpa-2.1-api.version>1.0.2.Final</hibernate-jpa-2.1-api.version>
         <spring-data-jpa-entity-graph.version>2.5.0</spring-data-jpa-entity-graph.version>
-        <nimbus-jose-jwt.version>9.15.2</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.37.2</nimbus-jose-jwt.version>
         <jjwt.version>0.9.1</jjwt.version>
     </properties>
 
