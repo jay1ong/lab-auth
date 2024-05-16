@@ -25,7 +25,7 @@
         <spring-cloud-version>2020.0.3</spring-cloud-version>
         <nacos-cloud.version>2021.1</nacos-cloud.version>
         <lombok.version>1.18.20</lombok.version>
-        <hutool-all.version>5.7.13</hutool-all.version>
+        <hutool-all.version>5.8.21</hutool-all.version>
         <hibernate-types-55.version>2.12.1</hibernate-types-55.version>
         <querydsl.version>5.0.0</querydsl.version>
         <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
